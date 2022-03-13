@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  mariadb:
+    image: mariadb:my_tag
+    container_name: mariadb
+    build: ./requirements/mariadb/
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - app-network
+
+  wordpress:
+    depends_on:
+      - mariadb
+    image: wordpress:my_tag
+    container_name: wordpress
+    build: ./requirements/wordpress/
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - WORDPRESS_DB_HOST=mariadb
+      - WP_REDIS_BACKEND_HOST=redis
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - app-network
+
+  nginx:
+    depends_on:
+      - wordpress
+    image: nginx:my_tag
+    container_name: nginx
+    build: ./requirements/nginx/
+    restart: always
+    volumes:
+      - wordpress:/var/www/html
+    ports:
+      - 443:443
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    name: app-network
+    driver: bridge
+
+volumes:
+  wordpress:
+    name: wordpress
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/data/wordpress
