@@ -1,5 +1,3 @@
-ID		= $$(docker images -aq)
-
 all:
 			mkdir -p ${HOME}/data/wordpress
 			mkdir -p ${HOME}/data/mariadb
@@ -7,6 +5,7 @@ all:
 
 clean:
 			docker rm -f $$(docker ps -aq)
+			docker network rm app-network
 			docker volume rm $$(docker volume ls -q)
 			sudo rm -rf ${HOME}/data
 

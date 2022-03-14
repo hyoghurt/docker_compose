@@ -10,6 +10,7 @@ RUN wget https://wordpress.org/latest.tar.gz
 RUN tar -xzvf latest.tar.gz
 RUN rm -rf latest.tar.gz
 RUN mv wordpress/* /var/www/html
+RUN rm -rf ./wordpress
 
 COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d/www.conf
 COPY ./conf/wp-config.php /var/www/html

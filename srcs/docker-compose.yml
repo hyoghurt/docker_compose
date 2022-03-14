@@ -1,31 +1,6 @@
 version: "3.9"
 
 services:
-  mariadb:
-    image: mariadb:my_tag
-    container_name: mariadb
-    build: ./requirements/mariadb/
-    restart: unless-stopped
-    env_file: .env
-    networks:
-      - app-network
-
-  wordpress:
-    depends_on:
-      - mariadb
-    image: wordpress:my_tag
-    container_name: wordpress
-    build: ./requirements/wordpress/
-    restart: unless-stopped
-    env_file: .env
-    environment:
-      - WORDPRESS_DB_HOST=mariadb
-      - WP_REDIS_BACKEND_HOST=redis
-    volumes:
-      - wordpress:/var/www/html
-    networks:
-      - app-network
-
   nginx:
     depends_on:
       - wordpress
@@ -37,6 +12,80 @@ services:
       - wordpress:/var/www/html
     ports:
       - 443:443
+    networks:
+      - app-network
+
+  wordpress:
+    depends_on:
+      - mariadb
+    image: wordpress:my_tag
+    container_name: wordpress
+    build: ./requirements/wordpress/
+    restart: always
+    env_file: .env
+    environment:
+      - WORDPRESS_DB_HOST=mariadb
+      - WP_REDIS_BACKEND_HOST=redis
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - app-network
+
+  mariadb:
+    depends_on:
+      - redis
+    image: mariadb:my_tag
+    container_name: mariadb
+    build: ./requirements/mariadb/
+    restart: always
+    env_file: .env
+    networks:
+      - app-network
+
+  redis:
+    image: redis:my_tag
+    container_name: redis
+    build: ./requirements/bonus/redis/
+    restart: always
+    networks:
+      - app-network
+
+  adminer:
+    depends_on:
+      - mariadb
+    image: adminer:my_tag
+    container_name: adminer
+    build: ./requirements/bonus/adminer/
+    restart: always
+    ports:
+      - 8880:80
+    networks:
+      - app-network
+
+  web:
+    image: web:my_tag
+    container_name: web
+    build: ./requirements/bonus/web/
+    restart: always
+    ports:
+      - 8800:80
+    networks:
+      - app-network
+
+  ftp:
+    depends_on:
+      - wordpress
+    image: ftp:my_tag
+    container_name: ftp
+    build: ./requirements/bonus/ftp/
+    restart: always
+    ports:
+      - 127.0.0.1:20:20
+      - 127.0.0.1:21:21
+      - 127.0.0.1:31001:31001
+      - 127.0.0.1:31002:31002
+    volumes:
+      - wordpress:/home/luser
     networks:
       - app-network
 
@@ -53,3 +102,10 @@ volumes:
       type: none
       o: bind
       device: ${HOME}/data/wordpress
+  mariadb:
+    name: mariadb
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/data/mariadb

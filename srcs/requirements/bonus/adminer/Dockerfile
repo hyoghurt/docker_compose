@@ -12,9 +12,6 @@ RUN apt-get install -y nginx wget
 RUN apt-get update -y
 RUN apt-get install -y supervisor
 
-RUN apt-get update -y
-RUN apt-get install -y net-tools vim
-
 RUN rm -rf /var/www/html
 
 COPY ./conf/default /etc/nginx/sites-available/default
