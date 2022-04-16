@@ -39,6 +39,8 @@ services:
     build: ./requirements/mariadb/
     restart: always
     env_file: .env
+    volumes:
+      - mariadb:/var/lib/mysql
     networks:
       - app-network
 
