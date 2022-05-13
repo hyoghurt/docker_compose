@@ -5,7 +5,7 @@
 **Dockerfile**  
 **Nginx / PHP / MariaDB** / при запуске cоздаются два пользователя для WordPress  
 
-![terminal](https://github.com/hyoghurt/trash/raw/master/terminal.png)
+![terminal](https://github.com/hyoghurt/docker_compose/raw/master/terminal.png)
 
 В дополнении имеются:
 ```
